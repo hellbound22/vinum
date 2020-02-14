@@ -2,7 +2,7 @@
 ### Sistema para controle de vales em exposições 
 
 ### TODO (Requisitos)
-- [ ] Cadastro de expositores
+- [x] Cadastro de expositores
 - [ ] Acerto de Comanda
 - [ ] Deduzir vales e adicionar mais conforme os Expositores ou os Operadores necessitarem
 - [ ] Sistema de login (Provavelmente fica para a parte do Danrlei)
@@ -25,7 +25,14 @@
 }
 ```
 - Possíveis retornos
-
+	- Status 409
+		- Conflito: CPF já cadastrado
+	- Status 406
+		- Cadastro Incompleto
+	- Status 201
+		- Expositor cadastrado com sucesso
+	- Status 500
+		- Erro Interno do Servidor
 
 ##### Cadastro de Visitantes
 
@@ -43,6 +50,8 @@
 - Possíveis retornos
 	- Status 409
 		- Conflito: CPF já cadastrado
+	- Status 406
+		- Cadastro Incompleto
 	- Status 201
 		- Visitante cadastrado com sucesso
 		- Retorna JSON com o numero da comanda emitida: 

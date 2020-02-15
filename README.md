@@ -4,11 +4,31 @@
 ### TODO (Requisitos)
 - [x] Cadastro de expositores
 - [ ] Acerto de Comanda
-- [ ] Deduzir vales e adicionar mais conforme os Expositores ou os Operadores necessitarem
+- [x] Deduzir vales e adicionar mais 
+	- [x] Adicionar (Em parte)
+	- [x] Deduzir
 - [ ] Sistema de login (Provavelmente fica para a parte do Danrlei)
 - [ ] Manter histórico das transações com Timestamp
 
+### Problemas a serem resolvidos
+- [ ] Gerenciamento de Sessão
+- [ ] Repetição de requests
+
 ### Documentação da API
+
+#### Cobrar vale(degustação)
+- Método: POST
+- Destino: /expositor/cobrar
+- Data: 
+```json
+{
+	"comanda": 2,
+	"qtd": 1,
+	"cpf_expositor" : 12123123, 
+	"sessao": "d87as5da7d5sasd8a8sd6a8sd56a85sd"
+}
+```
+- Possíveis retornos
 
 #### Cadastro de Expositores
 

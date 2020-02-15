@@ -6,7 +6,7 @@ from flask import request, abort
 from flask_api import status
 
 
-MONGO_SERVER = "ec2-18-222-148-185.us-east-2.compute.amazonaws.com" 
+MONGO_SERVER = "18.222.148.185" 
 
 client = pymongo.MongoClient(MONGO_SERVER)
 
@@ -29,6 +29,7 @@ def cadastro_expositor():
         if cadastrado is not None:
             return {"erro": "Exposutor já cadastrado"}, status.HTTP_409_CONFLICT
         else:
+            expositor["visitas"] = []
             db_expositores.insert_one(expositor)
 
             return {}, status.HTTP_201_CREATED
@@ -48,7 +49,7 @@ def cadastro_visitante():
         if cadastrado is not None:
             return {"erro": "Usuário já cadastrado"}, status.HTTP_409_CONFLICT
         else:
-            nova_comanda = interno.criar_comanda(visitante["nome"])
+            nova_comanda = interno.criar_comanda(visitante["cpf"])
             comanda = db_comandas.insert_one(nova_comanda).inserted_id
             
             visitante["comandas"] = [ comanda ]
@@ -59,7 +60,50 @@ def cadastro_visitante():
 
     return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
+@server.route("/expositor/cobrar", methods=["POST"])
+def cobrar():
+    import interno 
+    data = json.loads(request.data.decode("UTF-8"))
+
+    qtd = data["qtd"]
+
+    expositor = db_expositores.find_one({"cpf": data["cpf_expositor"]})
+    comanda = db_comandas.find_one({"nmr": data["comanda"]})
+    visitante = db_visitantes.find_one({"cpf": comanda["dono"]})
+
+    entrada_exp = {
+                "visitante": visitante["_id"],
+                "qnt": qtd
+            }
+
+    entrada_vis = {
+                "expositor": expositor["_id"],
+                "qnt": qtd
+            }
+    
+    lista_comanda = dict(comanda)["visitas"]
+    if lista_comanda is None:
+        lista_comanda = [entrada_vis]
+    else: 
+        lista_comanda.append(entrada_vis)
+
+    lista_expositor = dict(expositor)["visitas"]
+    if lista_expositor is None:
+        lista_expositor = [entrada_exp]
+    else: 
+        lista_expositor.append(entrada_exp)
+
+    db_comandas.find_one_and_update({"_id": comanda["_id"]}, {"$set": 
+        {"visitas": lista_comanda}})
+    db_expositores.find_one_and_update({"_id": expositor["_id"]}, {"$set": 
+        {"visitas": lista_expositor}})
+
+    return ""
+
+
 def start_server():
+    import interno
+
     server.run(use_reloader=False)
 
 

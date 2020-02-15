@@ -62,43 +62,48 @@ def cadastro_visitante():
 
 @server.route("/expositor/cobrar", methods=["POST"])
 def cobrar():
-    import interno 
     data = json.loads(request.data.decode("UTF-8"))
 
-    qtd = data["qtd"]
+    if ("comanda" not in data) or ("qnt" not in data) or ("cpf_expositor" not in data):
+        return {"erro": "Informações inconpletas"}, status.HTTP_406_NOT_ACCEPTABLE
 
-    expositor = db_expositores.find_one({"cpf": data["cpf_expositor"]})
-    comanda = db_comandas.find_one({"nmr": data["comanda"]})
-    visitante = db_visitantes.find_one({"cpf": comanda["dono"]})
+    else:
+        qtd = data["qtd"]
 
-    entrada_exp = {
-                "visitante": visitante["_id"],
-                "qnt": qtd
-            }
+        expositor = db_expositores.find_one({"cpf": data["cpf_expositor"]})
+        comanda = db_comandas.find_one({"nmr": data["comanda"]})
+        visitante = db_visitantes.find_one({"cpf": comanda["dono"]})
 
-    entrada_vis = {
-                "expositor": expositor["_id"],
-                "qnt": qtd
-            }
-    
-    lista_comanda = dict(comanda)["visitas"]
-    if lista_comanda is None:
-        lista_comanda = [entrada_vis]
-    else: 
-        lista_comanda.append(entrada_vis)
+        entrada_exp = {
+                    "visitante": visitante["_id"],
+                    "qnt": qtd
+                }
 
-    lista_expositor = dict(expositor)["visitas"]
-    if lista_expositor is None:
-        lista_expositor = [entrada_exp]
-    else: 
-        lista_expositor.append(entrada_exp)
+        entrada_vis = {
+                    "expositor": expositor["_id"],
+                    "qnt": qtd
+                }
+        
+        lista_comanda = dict(comanda)["visitas"]
+        if lista_comanda is None:
+            lista_comanda = [entrada_vis]
+        else: 
+            lista_comanda.append(entrada_vis)
 
-    db_comandas.find_one_and_update({"_id": comanda["_id"]}, {"$set": 
-        {"visitas": lista_comanda}})
-    db_expositores.find_one_and_update({"_id": expositor["_id"]}, {"$set": 
-        {"visitas": lista_expositor}})
+        lista_expositor = dict(expositor)["visitas"]
+        if lista_expositor is None:
+            lista_expositor = [entrada_exp]
+        else: 
+            lista_expositor.append(entrada_exp)
 
-    return ""
+        db_comandas.find_one_and_update({"_id": comanda["_id"]}, {"$set": 
+            {"visitas": lista_comanda}})
+        db_expositores.find_one_and_update({"_id": expositor["_id"]}, {"$set": 
+            {"visitas": lista_expositor}})
+        
+        return {}, status.HTTP_200_OK 
+
+    return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def start_server():

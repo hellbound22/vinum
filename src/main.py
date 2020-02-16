@@ -5,8 +5,9 @@ from flask import Flask
 from flask import request, abort
 from flask_api import status
 
-
 MONGO_SERVER = "18.222.148.185" 
+PRECO_FICHA = 5
+FICHAS_GRATIS = 3
 
 client = pymongo.MongoClient(MONGO_SERVER)
 
@@ -16,6 +17,34 @@ db_expositores = client["vinum"]["expositores"]
 db_controle = client["vinum"]["controle"]
 
 server = Flask(__name__)
+
+@server.route("/controle/acerto/<nmr>")
+def get_comanda_final(nmr): 
+    comanda = db_comandas.find_one({"nmr": int(nmr)})
+
+    if comanda is None:
+        return {"erro": "Impossível achar comanda"}, status.HTTP_404_NOT_FOUND
+    else:
+        qtd_visitas = 0
+
+        for v in comanda["visitas"]:
+            qtd_visitas += v["qnt"]
+        
+
+        preco_final = PRECO_FICHA * (qtd_visitas - FICHAS_GRATIS)
+        
+        if preco_final <= 0:
+            preco_final = 0
+
+        return {
+                "dono": comanda["dono"],
+                "nmr_tickets": qtd_visitas,
+                "preco_final" : preco_final 
+                }
+
+
+    return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
+
 
 @server.route("/cadastro_expositor", methods=["POST"])
 def cadastro_expositor():
@@ -68,7 +97,7 @@ def cobrar():
         return {"erro": "Informações inconpletas"}, status.HTTP_406_NOT_ACCEPTABLE
 
     else:
-        qtd = data["qtd"]
+        qtd = data["qnt"]
 
         expositor = db_expositores.find_one({"cpf": data["cpf_expositor"]})
         comanda = db_comandas.find_one({"nmr": data["comanda"]})
@@ -109,7 +138,7 @@ def cobrar():
 def start_server():
     import interno
 
-    server.run(use_reloader=False)
+    server.run()
 
 
 if __name__ == "__main__":

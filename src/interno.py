@@ -30,6 +30,12 @@ def adicionar_comanda_a_visitante(cpf):
     db_visitantes.find_one_and_update({"cpf": cpf}, {"$set": 
         {"comandas": lista}})
 
+
+# Usado para quando a comanda é fechada
+def travar_comanda_id(cmd_id):
+    comanda = db_comandas.find_one_and_update({"_id": cmd_id}, {"$set": 
+        {"travado": True}})
+
 def lista_comandas_cpf(cpf):
     visitante = db_visitantes.find_one({"cpf": cpf})
 

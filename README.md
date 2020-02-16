@@ -3,7 +3,8 @@
 
 ### TODO (Requisitos)
 - [x] Cadastro de expositores
-- [ ] Acerto de Comanda
+- [x] Acerto de Comanda (Em parte)
+	- [ ] Trancar comanda para não poder mais receber pedidos
 - [x] Deduzir vales e adicionar mais 
 	- [x] Adicionar (Em parte)
 	- [x] Deduzir
@@ -14,7 +15,32 @@
 - [ ] Gerenciamento de Sessão
 - [ ] Repetição de requests
 
+### Features futuras
+- Emissão e análise de dados para os expositores
+- Monitoramento em tempo real(Imagine uma tela dizendo quais são os expositores mais procurados no momento)
+- Votação por parte dos visitantes do melhor vinho ou expositor
+
 ### Documentação da API
+
+#### Requisitar acerto de contas
+- Método: POST
+- Destino: /controle/acerto/'<comanda>'
+	- Onde comanda é o número da comanda
+- Possíveis retornos
+	- Status 406
+		- Erro: Impossível achar comanda com esse número 
+	- Status 200
+		- Ok
+		- Retorna dados em json com a seguinte estrutura
+		```json
+			{
+				  "dono": 12123123,
+				  "nmr_tickets": 8,
+				  "preco_final": 25
+			}
+			```
+	- Status 500 
+		- Erro Interno do servidor 
 
 #### Cobrar vale(degustação)
 - Método: POST
@@ -23,12 +49,18 @@
 ```json
 {
 	"comanda": 2,
-	"qtd": 1,
+	"qnt": 1,
 	"cpf_expositor" : 12123123, 
 	"sessao": "d87as5da7d5sasd8a8sd6a8sd56a85sd"
 }
 ```
 - Possíveis retornos
+	- Status 406
+		- Erro: Informações Incompletas
+	- Status 200
+		- Ok, Sucesso
+	- Status 500
+		- Erro Interno do Servidor 
 
 #### Cadastro de Expositores
 

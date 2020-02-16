@@ -33,7 +33,7 @@ def adicionar_comanda_a_visitante(cpf):
 
 # Usado para quando a comanda é fechada
 def travar_comanda_id(cmd_id):
-    comanda = db_comandas.find_one_and_update({"_id": cmd_id}, {"$set": 
+    return db_comandas.find_one_and_update({"_id": cmd_id}, {"$set": 
         {"travado": True}})
 
 def lista_comandas_cpf(cpf):

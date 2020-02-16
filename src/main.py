@@ -18,7 +18,32 @@ db_controle = client["vinum"]["controle"]
 
 server = Flask(__name__)
 
-@server.route("/controle/acerto/<nmr>")
+@server.route("/controle/trancar", methods=["POST"])
+def trancar_comanda(): 
+    import interno
+    data = json.loads(request.data.decode("UTF-8"))
+
+    if ("comanda" not in data) or ("cpf_associado" not in data):
+        return {"erro": "Dados Incompletos"}, status.HTTP_406_NOT_ACCEPTABLE
+
+    comanda = db_comandas.find_one({"nmr": data["comanda"]})
+    
+    if comanda is None:
+        return {"erro": "Impossível achar comanda"}, status.HTTP_404_NOT_FOUND
+
+    elif comanda["dono"] != data["cpf_associado"]:
+        return {"erro": "CPF não corresponde ao dono da comanda"}, status.HTTP_406_NOT_ACCEPTABLE
+
+    else:
+        confirm = interno.travar_comanda_id(comanda["_id"])
+        if confirm is not None:
+            return {}, status.HTTP_200_OK
+
+    return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
+@server.route("/controle/acerto/<nmr>", methods=["GET"])
 def get_comanda_final(nmr): 
     comanda = db_comandas.find_one({"nmr": int(nmr)})
 
@@ -99,9 +124,13 @@ def cobrar():
     else:
         qtd = data["qnt"]
 
+        # TODO: Verificar se as foi possível achar os dados
         expositor = db_expositores.find_one({"cpf": data["cpf_expositor"]})
         comanda = db_comandas.find_one({"nmr": data["comanda"]})
         visitante = db_visitantes.find_one({"cpf": comanda["dono"]})
+
+        if comanda["travado"] == True:
+            return {"erro": "Comanda já travada"}, status.HTTP_403_FORBIDDEN
 
         entrada_exp = {
                     "visitante": visitante["_id"],

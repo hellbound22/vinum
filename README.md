@@ -4,7 +4,8 @@
 ### TODO (Requisitos)
 - [x] Cadastro de expositores
 - [x] Acerto de Comanda (Em parte)
-	- [ ] Trancar comanda para não poder mais receber pedidos
+	- [x] Travar comanda para não poder mais receber pedidos
+	- [ ] Travar todas as comandas de um visitante
 - [x] Deduzir vales e adicionar mais 
 	- [x] Adicionar (Em parte)
 	- [x] Deduzir
@@ -22,10 +23,31 @@
 
 ### Documentação da API
 
-#### Requisitar acerto de contas
+#### Travar Comanda(após acerto)
 - Método: POST
-- Destino: /controle/acerto/'<comanda>'
-	- Onde comanda é o número da comanda
+- Destino: /controle/trancar
+- Data: 
+```json
+{
+	"comanda": 2,
+	"cpf_acossiado" : 12123123 
+}
+```
+- Possíveis retornos
+	- Status 406
+		- Erro: Dados Incompletos
+		- Erro: CPF não corresponde ao dono da comanda
+	- Status 404
+		- Erro: Impossível achar comanda 
+	- Status 200
+		- Ok, Sucesso
+	- Status 500
+		- Erro Interno do Servidor 
+
+#### Requisitar acerto de contas
+- Método: GET 
+- Destino: /controle/acerto/'''comanda'''
+	- Onde '''comanda''' é o número da comanda a ser consultada
 - Possíveis retornos
 	- Status 406
 		- Erro: Impossível achar comanda com esse número 
@@ -33,12 +55,12 @@
 		- Ok
 		- Retorna dados em json com a seguinte estrutura
 		```json
-			{
-				  "dono": 12123123,
-				  "nmr_tickets": 8,
-				  "preco_final": 25
-			}
-			```
+		{
+			"dono": 12123123,
+			"nmr_tickets": 8,
+			"preco_final": 25
+		}
+		```
 	- Status 500 
 		- Erro Interno do servidor 
 

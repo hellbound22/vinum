@@ -1,4 +1,13 @@
-from main import db_comandas, db_visitantes
+import jwt
+
+from main import db_comandas, db_visitantes, server
+
+def check_auth(token):
+    try:
+        data = jwt.decode(token, server.config["SECRET_KEY"])
+        return data
+    except:
+        return False
 
 def criar_comanda(visi):
     ultimo_nmr = db_comandas.find()

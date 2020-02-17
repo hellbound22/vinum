@@ -1,9 +1,13 @@
 import json
 import pymongo
+import jwt
+import datetime
 
 from flask import Flask
 from flask import request, abort
 from flask_api import status
+
+from werkzeug.security import safe_str_cmp
 
 MONGO_SERVER = "18.222.148.185" 
 PRECO_FICHA = 5
@@ -15,12 +19,45 @@ db_visitantes = client["vinum"]["visitantes"]
 db_comandas = client["vinum"]["comandas"]
 db_expositores = client["vinum"]["expositores"]
 db_controle = client["vinum"]["controle"]
+db_auth = client["vinum"]["auth"]
 
 server = Flask(__name__)
+server.config['SECRET_KEY'] = 'testevinum'
+
+@server.route("/gen_auth", methods=["POST"])
+def gen_auth():
+    import interno
+    if "Jwt-Token" not in request.headers:
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    token = request.headers["Jwt-Token"]
+    auth = interno.check_auth(token)
+
+    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    data = json.loads(request.data.decode("UTF-8"))
+    
+    user = db_auth.find_one({"user": data["user"]})
+    
+    if user is not None and safe_str_cmp(user["hash"], data["hash"]):
+        token = jwt.encode({"user": user["user"], "role": user["role"] , "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)}, server.config["SECRET_KEY"])
+
+        return {"token": token.decode("UTF-8")}, status.HTTP_201_CREATED
+
 
 @server.route("/controle/trancar", methods=["POST"])
 def trancar_comanda(): 
     import interno
+    if "Jwt-Token" not in request.headers:
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    token = request.headers["Jwt-Token"]
+    auth = interno.check_auth(token)
+
+    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
     data = json.loads(request.data.decode("UTF-8"))
 
     if ("comanda" not in data) or ("cpf_associado" not in data):
@@ -45,6 +82,16 @@ def trancar_comanda():
 
 @server.route("/controle/acerto/<nmr>", methods=["GET"])
 def get_comanda_final(nmr): 
+    import interno
+    if "Jwt-Token" not in request.headers:
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    token = request.headers["Jwt-Token"]
+    auth = interno.check_auth(token)
+
+    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
     comanda = db_comandas.find_one({"nmr": int(nmr)})
 
     if comanda is None:
@@ -73,6 +120,16 @@ def get_comanda_final(nmr):
 
 @server.route("/cadastro_expositor", methods=["POST"])
 def cadastro_expositor():
+    import interno
+    if "Jwt-Token" not in request.headers:
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    token = request.headers["Jwt-Token"]
+    auth = interno.check_auth(token)
+
+    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
     expositor = json.loads(request.data.decode("UTF-8"))
 
     if ("expositor" not in expositor) or ("cpf" not in expositor) or ("cidade" not in expositor) or ("email" not in expositor) or ("hash" not in expositor):
@@ -81,7 +138,7 @@ def cadastro_expositor():
     else:
         cadastrado = db_expositores.find_one({"cpf": expositor["cpf"]})
         if cadastrado is not None:
-            return {"erro": "Exposutor já cadastrado"}, status.HTTP_409_CONFLICT
+            return {"erro": "Expositor já cadastrado"}, status.HTTP_409_CONFLICT
         else:
             expositor["visitas"] = []
             db_expositores.insert_one(expositor)
@@ -92,7 +149,16 @@ def cadastro_expositor():
 
 @server.route("/cadastro_visitante", methods=["POST"])
 def cadastro_visitante():
-    import interno 
+    import interno
+    if "Jwt-Token" not in request.headers:
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    token = request.headers["Jwt-Token"]
+    auth = interno.check_auth(token)
+
+    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
     visitante = json.loads(request.data.decode("UTF-8"))
 
     if ("nome" not in visitante) or ("cpf" not in visitante) or ("nascimento" not in visitante) or ("cidade" not in visitante):
@@ -116,6 +182,16 @@ def cadastro_visitante():
 
 @server.route("/expositor/cobrar", methods=["POST"])
 def cobrar():
+    import interno
+    if "Jwt-Token" not in request.headers:
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
+    token = request.headers["Jwt-Token"]
+    auth = interno.check_auth(token)
+
+    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "expo".encode("UTF-8")):
+        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
+
     data = json.loads(request.data.decode("UTF-8"))
 
     if ("comanda" not in data) or ("qnt" not in data) or ("cpf_expositor" not in data):
@@ -128,6 +204,9 @@ def cobrar():
         expositor = db_expositores.find_one({"cpf": data["cpf_expositor"]})
         comanda = db_comandas.find_one({"nmr": data["comanda"]})
         visitante = db_visitantes.find_one({"cpf": comanda["dono"]})
+
+        if (comanda is None) or (expositor is None) or (visitante is None):
+            return {"erro": "Impossível achar alguns atores"}, status.HTTP_404_NOT_FOUND
 
         if comanda["travado"] == True:
             return {"erro": "Comanda já travada"}, status.HTTP_403_FORBIDDEN

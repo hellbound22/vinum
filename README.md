@@ -9,11 +9,11 @@
 - [x] Deduzir vales e adicionar mais 
 	- [x] Adicionar (Em parte)
 	- [x] Deduzir
-- [ ] Sistema de login (Provavelmente fica para a parte do Danrlei)
+- [x] Sistema de Tokens JWT(Autenticação)
 - [ ] Manter histórico das transações com Timestamp
 
 ### Problemas a serem resolvidos
-- [ ] Gerenciamento de Sessão
+- [x] Gerenciamento de Sessão
 - [ ] Repetição de requests
 
 ### Features futuras
@@ -23,7 +23,32 @@
 
 ### Documentação da API
 
+#### Gerar Token de Autorização(login)
+- Autorização: adm
+- Método: POST
+- Destino: /gen_auth
+- Data: 
+```json
+{
+	"user": "hahahahah@email.com",
+	"hash" : "12123123" 
+}
+```
+- Possíveis retornos
+	- Status 201
+		- Gera um token JWT que DEVE ser usado no HEADER de qualquer requisição ao servidor
+		- Use a header "Jwt-Token"
+		- Exemplo:
+		```json
+		{
+			"token": "asdgd92d9gds2dgs298gds92gd27g"
+		}
+		```
+	- Status 401
+		- Erro: Acesso Proibido
+
 #### Travar Comanda(após acerto)
+- Autorização: adm
 - Método: POST
 - Destino: /controle/trancar
 - Data: 
@@ -43,8 +68,11 @@
 		- Ok, Sucesso
 	- Status 500
 		- Erro Interno do Servidor 
+	- Status 401
+		- Erro: Acesso Proibido
 
 #### Requisitar acerto de contas
+- Autorização: adm
 - Método: GET 
 - Destino: /controle/acerto/'''comanda'''
 	- Onde '''comanda''' é o número da comanda a ser consultada
@@ -63,8 +91,12 @@
 		```
 	- Status 500 
 		- Erro Interno do servidor 
+	- Status 401
+		- Erro: Acesso Proibido
+	
 
 #### Cobrar vale(degustação)
+- Autorização: expo
 - Método: POST
 - Destino: /expositor/cobrar
 - Data: 
@@ -83,9 +115,11 @@
 		- Ok, Sucesso
 	- Status 500
 		- Erro Interno do Servidor 
+	- Status 401
+		- Erro: Acesso Proibido
 
 #### Cadastro de Expositores
-
+- Autorização: adm
 - Método: POST
 - Destino: /cadastro_expositor
 - Data: 
@@ -107,9 +141,11 @@
 		- Expositor cadastrado com sucesso
 	- Status 500
 		- Erro Interno do Servidor
+	- Status 401
+		- Erro: Acesso Proibido
 
 ##### Cadastro de Visitantes
-
+- Autorização: adm
 - Método: POST
 - Destino: /cadastro_visitante
 - Data: 
@@ -134,3 +170,5 @@
 		```
 	- Status 500
 		- Erro Interno do Servidor
+	- Status 401
+		- Erro: Acesso Proibido

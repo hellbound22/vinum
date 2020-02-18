@@ -27,15 +27,6 @@ server.config['SECRET_KEY'] = 'testevinum'
 @server.route("/gen_auth", methods=["POST"])
 def gen_auth():
     import interno
-    if "Jwt-Token" not in request.headers:
-        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
-
-    token = request.headers["Jwt-Token"]
-    auth = interno.check_auth(token)
-
-    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
-        return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
-
     data = json.loads(request.data.decode("UTF-8"))
     
     user = db_auth.find_one({"user": data["user"]})

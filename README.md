@@ -1,15 +1,17 @@
 ![Vinum Expo](/img/Logo.png)
-### Sistema para controle de vales em exposições 
+### Sistema para controle de vales em degustações
 
 ### TODO (Requisitos)
 - [x] Cadastro de expositores
 - [x] Acerto de Comanda (Em parte)
 	- [x] Travar comanda para não poder mais receber pedidos
+	- [ ] Cobrar todas as comandas de um visitante
 	- [ ] Travar todas as comandas de um visitante
 - [x] Deduzir vales e adicionar mais 
 	- [x] Adicionar (Em parte)
 	- [x] Deduzir
 - [x] Sistema de Tokens JWT(Autenticação)
+- [ ] Associar credenciais automaticamente no ato do cadastro
 - [ ] Manter histórico das transações com Timestamp
 
 ### Problemas a serem resolvidos
@@ -21,10 +23,20 @@
 - Monitoramento em tempo real(Imagine uma tela dizendo quais são os expositores mais procurados no momento)
 - Votação por parte dos visitantes do melhor vinho ou expositor
 
+### Uso
+
+#### Dependências Python
+- json
+- pymongo
+- PyJWT
+- datetime
+- flask
+- flask_api
+- werkzeug
+
 ### Documentação da API
 
 #### Gerar Token de Autorização(login)
-- Autorização: adm
 - Método: POST
 - Destino: /gen_auth
 - Data: 

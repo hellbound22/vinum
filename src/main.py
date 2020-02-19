@@ -26,7 +26,7 @@ server.config['SECRET_KEY'] = 'testevinum'
 
 @server.route("/gen_auth", methods=["POST"])
 def gen_auth():
-    import interno
+    import src.interno
     data = json.loads(request.data.decode("UTF-8"))
     
     user = db_auth.find_one({"user": data["user"]})
@@ -39,7 +39,7 @@ def gen_auth():
 
 @server.route("/controle/trancar", methods=["POST"])
 def trancar_comanda(): 
-    import interno
+    import src.interno
     if "Jwt-Token" not in request.headers:
         return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
 
@@ -73,7 +73,7 @@ def trancar_comanda():
 
 @server.route("/controle/acerto/<nmr>", methods=["GET"])
 def get_comanda_final(nmr): 
-    import interno
+    import src.interno
     if "Jwt-Token" not in request.headers:
         return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
 
@@ -111,7 +111,7 @@ def get_comanda_final(nmr):
 
 @server.route("/cadastro_expositor", methods=["POST"])
 def cadastro_expositor():
-    import interno
+    import src.interno
     if "Jwt-Token" not in request.headers:
         return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
 
@@ -140,7 +140,7 @@ def cadastro_expositor():
 
 @server.route("/cadastro_visitante", methods=["POST"])
 def cadastro_visitante():
-    import interno
+    import src.interno
     if "Jwt-Token" not in request.headers:
         return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
 
@@ -173,7 +173,7 @@ def cadastro_visitante():
 
 @server.route("/expositor/cobrar", methods=["POST"])
 def cobrar():
-    import interno
+    import src.interno
     if "Jwt-Token" not in request.headers:
         return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
 

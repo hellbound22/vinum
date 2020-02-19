@@ -1,6 +1,6 @@
 import jwt
 
-from main import db_comandas, db_visitantes, server
+from src.main import db_comandas, db_visitantes, server
 
 def check_auth(token):
     try:

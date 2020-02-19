@@ -234,11 +234,5 @@ def cobrar():
     return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-def start_server():
-    import interno
-
-    server.run()
-
-
-if __name__ == "__main__":
-    start_server()
+def start_server(bind, debug):
+    server.run(host=bind, debug=debug)

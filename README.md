@@ -33,6 +33,17 @@
 - flask_api
 - werkzeug
 
+#### Iniciar Servidor
+Para desenvolvimento:
+```
+python3.7 start_dev.py
+```
+
+Para produção:
+```
+python3.7 start_production.py
+```
+
 ### Documentação da API
 
 #### Gerar Token de Autorização(login)
@@ -52,7 +63,9 @@
 		- Exemplo:
 		```json
 		{
-			"token": "asdgd92d9gds2dgs298gds92gd27g"
+			"cpf": "666",
+    		"role": "adm",
+    		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWRtIiwicm9sZSI6ImFkbSIsImV4cCI6MTU4MjgwNDY0MX0.QH4asiDJECR44i3O_gYtBgOC58POVx-zmeeIGcvZ0RU"
 		}
 		```
 	- Status 401
@@ -115,8 +128,7 @@
 {
 	"comanda": 2,
 	"qnt": 1,
-	"cpf_expositor" : 12123123, 
-	"sessao": "d87as5da7d5sasd8a8sd6a8sd56a85sd"
+	"cpf_expositor" : 12123123
 }
 ```
 - Possíveis retornos
@@ -137,7 +149,7 @@
 ```json
 {
 	"expositor" : "Vinho Derruba", 
-	"cpf" : 12123123, 
+	"cpf" : "12123123", 
 	"cidade" : "Aroio",
 	"email": "vinhoderruba@nosec.com.br",
 	"hash": "d87as5da7d5sasd8a8sd6a8sd56a85sd"

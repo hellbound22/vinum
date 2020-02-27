@@ -11,8 +11,7 @@
 	- [x] Adicionar (Em parte)
 	- [x] Deduzir
 - [x] Sistema de Tokens JWT(Autenticação)
-- [ ] Associar credenciais automaticamente no ato do cadastro
-- [ ] Manter histórico das transações com Timestamp
+- [x] Associar credenciais automaticamente no ato do cadastro
 
 ### Problemas a serem resolvidos
 - [x] Gerenciamento de Sessão

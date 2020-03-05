@@ -59,7 +59,7 @@ python3.7 start_production.py
 - Possíveis retornos
 	- Status 201
 		- Gera um token JWT que DEVE ser usado no HEADER de qualquer requisição ao servidor
-		- Use a header "Jwt-Token"
+		- Armazene o CPF em um cookie para a cobrança da comanda 
 		- Exemplo:
 		```json
 		{

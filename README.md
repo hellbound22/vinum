@@ -1,6 +1,14 @@
 ![Vinum Expo](/img/Logo.png)
 ### Sistema para controle de vales em degustações
 
+### Teste online (DISPONÍVEL)
+- Url endpoint: http://18.222.148.185:5000/ 
+- Autenticação
+	- Usuário: adm-teste
+	- Senha: testelivre
+- Assim que gerar o JWT, você terá acesso a toda a plataforma
+- Para testar usando Postman utilize: https://www.getpostman.com/collections/ab8d2c0b3d56ab77cc10
+
 ### TODO (Requisitos)
 - [x] Cadastro de expositores
 - [x] Acerto de Comanda (Em parte)

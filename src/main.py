@@ -15,11 +15,11 @@ FICHAS_GRATIS = 3
 
 client = pymongo.MongoClient(MONGO_SERVER, connect=False)
 
-db_visitantes = client["vinum"]["visitantes"]
-db_comandas = client["vinum"]["comandas"]
-db_expositores = client["vinum"]["expositores"]
-db_controle = client["vinum"]["controle"]
-db_auth = client["vinum"]["auth"]
+DB_VISITANTES = client["vinum"]["visitantes"]
+DB_COMANDAS = client["vinum"]["comandas"]
+DB_EXPOSITORES = client["vinum"]["expositores"]
+DB_CONTROLE = client["vinum"]["controle"]
+DB_AUTH = client["vinum"]["auth"]
 
 server = Flask(__name__)
 server.config['SECRET_KEY'] = 'testevinum'
@@ -69,7 +69,8 @@ def trancar_comanda():
 
     return {}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
-
+def check_role(auth, role):
+    return auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), role.encode("UTF-8"))
 
 @server.route("/controle/acerto/<nmr>", methods=["GET"])
 def get_comanda_final(nmr): 
@@ -79,8 +80,8 @@ def get_comanda_final(nmr):
 
     token = request.headers["Jwt-Token"]
     auth = src.interno.check_auth(token)
-
-    if auth is not False and not safe_str_cmp(auth["role"].encode("UTF-8"), "adm".encode("UTF-8")):
+    
+    if check_role(auth, "adm"):
         return {"erro": "Acesso Proibido"}, status.HTTP_401_UNAUTHORIZED
 
     comanda = db_comandas.find_one({"nmr": int(nmr)})
